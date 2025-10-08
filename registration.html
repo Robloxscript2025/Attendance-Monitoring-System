@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Registration & Login</title>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body {
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+      background: #0b0b0b;
+    }
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle at 25% 25%, #0ff, transparent 40%),
+                  radial-gradient(circle at 75% 75%, #ff00ff, transparent 40%),
+                  radial-gradient(circle at 75% 25%, #00ffff, transparent 40%),
+                  radial-gradient(circle at 25% 75%, #ff0099, transparent 40%);
+      background-blend-mode: screen;
+      filter: blur(120px);
+      animation: neonMove 12s infinite alternate ease-in-out;
+      z-index: -1;
+    }
+    @keyframes neonMove {
+      0% { transform: translate(-10%, -10%) scale(1); }
+      50% { transform: translate(10%, 10%) scale(1.2); }
+      100% { transform: translate(-10%, -10%) scale(1); }
+    }
+
+    .form-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 40px 50px;
+      width: 550px;
+      max-width: 90%;
+      box-shadow: 0 0 20px rgba(0,255,255,0.3), 0 0 40px rgba(255,0,255,0.2);
+      animation: fadeIn 0.6s ease;
+      color: #000;
+      z-index: 2;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2, h3 { color: #1f3c88; }
+    p.subtitle { font-size: 14px; color: #555; margin-bottom: 25px; }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 18px;
+    }
+    .input-group i {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+      font-size: 16px;
+    }
+    .input-group i.left { left: 14px; }
+    .input-group i.right {
+      right: 14px;
+      cursor: pointer;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 42px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #1f3c88;
+      box-shadow: 0 0 6px #00ffff;
+    }
+
+    .name-fields { display: flex; gap: 15px; }
+
+    button {
+      width: 100%;
+      background: linear-gradient(90deg, #1f3c88, #3056d3);
+      color: #fff;
+      border: none;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease;
+      letter-spacing: 0.5px;
+      margin-top: 5px;
+      box-shadow: 0 0 10px rgba(0,255,255,0.5);
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #3056d3, #1f3c88);
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(0,255,255,0.8);
+    }
+
+    .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    #qrcode {
+      margin: 10px auto;
+      padding: 10px;
+      background: white;
+      display: inline-block;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .download-btn {
+      background: linear-gradient(90deg, #00b09b, #96c93d);
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: 0.3s;
+    }
+
+    .download-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.03);
+    }
+
+    .back-link {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #1f3c88;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .back-link:hover {
+      opacity: 0.8;
+    }
+
+    footer {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 13px;
+      color: #fff;
+      opacity: 0.9;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Registration Form -->
+  <div class="form-container" id="registerContainer">
+    <h2>Student Registration</h2>
+    <p class="subtitle">Register to get your personalized QR code for event check-ins.</p>
+
+    <form id="regForm">
+      <div class="name-fields">
+        <div class="input-group" style="flex:1;">
+          <i class="fa-solid fa-user left"></i>
+          <input type="text" id="fname" placeholder="First Name" required>
+        </div>
+        <div class="input-group" style="flex:1;">
+          <i class="fa-solid fa-user left"></i>
+          <input type="text" id="lname" placeholder="Last Name" required>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-id-card left"></i>
+        <input type="text" id="schoolid" placeholder="School ID" required>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-lock left"></i>
+        <input type="password" id="password" placeholder="Password" required>
+        <i class="fa-solid fa-eye right" onclick="togglePassword('password', this)"></i>
+      </div>
+
+      <div class="name-fields">
+        <div class="input-group" style="flex:1;">
+          <i class="fa-solid fa-graduation-cap left"></i>
+          <select id="course" required>
+            <option value="">-- Select Program --</option>
+            <option value="BSIT">BSIT</option>
+            <option value="BSCPE">BSCPE</option>
+          </select>
+        </div>
+        <div class="input-group" style="flex:1;">
+          <i class="fa-solid fa-layer-group left"></i>
+          <select id="year" required>
+            <option value="">-- Select Year --</option>
+            <option value="1st Year">1st Year</option>
+            <option value="2nd Year">2nd Year</option>
+            <option value="3rd Year">3rd Year</option>
+            <option value="4th Year">4th Year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <i class="fa-solid fa-building left"></i>
+        <select id="department" required>
+          <option value="">-- Select Department --</option>
+          <option value="Computer Studies">Computer Studies</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Business Administration">Business Administration</option>
+          <option value="Arts and Sciences">Arts and Sciences</option>
+        </select>
+      </div>
+
+      <button type="submit"><i class="fa-solid fa-qrcode"></i> Confirm Registration and Generate QR Code</button>
+      <div class="back-link" id="loginLink">Already have an account? Login here</div>
+    </form>
+  </div>
+
+  <!-- Login Form -->
+  <div class="form-container" id="loginContainer" style="display:none;">
+    <h2>Student Login</h2>
+    <p class="subtitle">Enter your School ID and password.</p>
+
+    <form id="loginForm">
+      <div class="input-group">
+        <i class="fa-solid fa-id-card left"></i>
+        <input type="text" id="loginSchoolID" placeholder="School ID" required>
+      </div>
+      <div class="input-group">
+        <i class="fa-solid fa-lock left"></i>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <i class="fa-solid fa-eye right" onclick="togglePassword('loginPassword', this)"></i>
+      </div>
+      <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+      <div class="back-link" id="backToRegister">Don't have an account? Register here</div>
+    </form>
+  </div>
+
+  <!-- QR Section -->
+  <div class="form-container qr-section" id="qrSection" style="display:none;">
+    <h3>Registration Successful!</h3>
+    <p>Here’s your personalized QR Code:</p>
+    <div id="qrcode"></div>
+    <button class="download-btn" id="downloadQR"><i class="fa-solid fa-download"></i> Download QR</button>
+    <div class="back-link" id="backLink">Don't have an account? Register here</div>
+  </div>
+
+  <footer>© 2025 QR Event Monitoring System</footer>
+
+  <script>
+    function togglePassword(id, icon){
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
+      icon.classList.toggle("fa-eye");
+      icon.classList.toggle("fa-eye-slash");
+    }
+
+    const regForm = document.getElementById("regForm");
+    const loginForm = document.getElementById("loginForm");
+    const qrSection = document.getElementById("qrSection");
+    const qrcodeContainer = document.getElementById("qrcode");
+    const downloadQR = document.getElementById("downloadQR");
+
+    const registerContainer = document.getElementById("registerContainer");
+    const loginContainer = document.getElementById("loginContainer");
+
+    const loginLink = document.getElementById("loginLink");
+    const backToRegister = document.getElementById("backToRegister");
+    const backLink = document.getElementById("backLink");
+
+    // Registration
+    regForm.addEventListener("submit", async function(e){
+  e.preventDefault();
+  const data = {
+    fname: document.getElementById("fname").value,
+    lname: document.getElementById("lname").value,
+    schoolid: document.getElementById("schoolid").value,
+    password: document.getElementById("password").value,
+    course: document.getElementById("course").value,
+    year: document.getElementById("year").value,
+    department: document.getElementById("department").value
+  };
+
+  try {
+    const res = await fetch('register.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      showQR(data); // keeps your QR code generation
+    } else {
+      alert(result.message);
+    }
+  } catch(err){
+    alert("Server error: " + err.message);
+    console.error(err);
+  }
+});
+
+    // Login
+    loginForm.addEventListener("submit", async function(e){
+      e.preventDefault();
+      const data = {
+        schoolid: document.getElementById("loginSchoolID").value.trim(),
+        password: document.getElementById("loginPassword").value.trim()
+      };
+
+      const res = await fetch('login.php', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      if(result.success){
+        alert("Login successful!");
+        showQR(result.data);
+      } else {
+        alert(result.message);
+      }
+    });
+
+    function showQR(data){
+      registerContainer.style.display = "none";
+      loginContainer.style.display = "none";
+      qrSection.style.display = "block";
+      qrcodeContainer.innerHTML = "";
+      new QRCode(qrcodeContainer, {
+        text: `Name: ${data.fname} ${data.lname}\nSchool ID: ${data.schoolid}\nCourse: ${data.course}\nYear: ${data.year}\nDepartment: ${data.department}`,
+        width: 200,
+        height: 200
+      });
+
+      downloadQR.onclick = () => {
+        const img = qrcodeContainer.querySelector("img");
+        if(img){
+          const link = document.createElement("a");
+          link.href = img.src;
+          link.download = `${data.fname}_${data.lname}_QR.png`;
+          link.click();
+        }
+      };
+    }
+
+    loginLink.addEventListener("click", () => {
+      registerContainer.style.display = "none";
+      loginContainer.style.display = "block";
+      qrSection.style.display = "none";
+    });
+
+    backToRegister.addEventListener("click", () => {
+      loginContainer.style.display = "none";
+      registerContainer.style.display = "block";
+      qrSection.style.display = "none";
+    });
+
+    backLink.addEventListener("click", () => {
+      registerContainer.style.display = "block";
+      loginContainer.style.display = "none";
+      qrSection.style.display = "none";
+      regForm.reset();
+    });
+  </script>
+</body>
+</html>
